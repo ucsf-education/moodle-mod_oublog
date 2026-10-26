@@ -179,8 +179,15 @@ class privacy_provider_test extends \core_privacy\tests\provider_testcase {
     public function test_get_data_link() {
         global $DB;
 
-        // User links are in the global blog so let's use that one.
-        $globalblog = $DB->get_record('oublog', []);
+        // User links are in the global blog. It is no longer seeded on install under
+        // PHPUnit, so create it if absent, then use it.
+        if (!$globalblog = $DB->get_record('oublog', ['global' => 1])) {
+            $globalblog = $this->getDataGenerator()->create_module('oublog', [
+                'course' => SITEID,
+                'global' => 1,
+                'maxvisibility' => OUBLOG_VISIBILITY_PUBLIC,
+            ]);
+        }
 
         // Create user account for test.
         $generator = $this->getDataGenerator();
