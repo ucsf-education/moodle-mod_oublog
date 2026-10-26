@@ -1929,7 +1929,11 @@ class oublog_locallib_test extends oublog_test_lib {
      * @return void
      */
     public function test_oublog_check_view_permissions_personal_restrict() {
-        global $USER;
+        global $USER, $DB, $SITE;
+        // The global blog is no longer seeded on install under PHPUnit, so create it if absent.
+        if (!$DB->get_record('oublog', array('global' => 1))) {
+            $this->get_new_oublog($SITE->id, array('global' => 1, 'maxvisibility' => OUBLOG_VISIBILITY_PUBLIC));
+        }
         list($oublog, $oubloginstance) = oublog_get_personal_blog($USER->id);
         $cm = get_coursemodule_from_instance('oublog', $oublog->id);
         $this->assertNull(oublog_check_view_permissions($oublog, context_module::instance($cm->id), $cm));

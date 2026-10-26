@@ -30,6 +30,15 @@ function xmldb_oublog_install() {
 
     require_once($CFG->dirroot . '/course/lib.php');
 
+    // Under PHPUnit, do not seed the global blog on install. It adds a
+    // course_modules row to the shared test baseline, which pollutes core
+    // tests that count course_modules without a filter (e.g.
+    // core_courseformat\local\cmactions_test). Tests that need the global
+    // blog create it themselves. Behat and production installs are unaffected.
+    if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+        return true;
+    }
+
     // Setup the global blog.
     $oublog = new stdClass;
     $oublog->course = SITEID;
